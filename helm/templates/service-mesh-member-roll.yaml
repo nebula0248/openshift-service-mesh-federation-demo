@@ -1,0 +1,8 @@
+kind: ServiceMeshMemberRoll
+apiVersion: maistra.io/v1
+metadata:
+  name: default
+  namespace: {{ index .Values "local-mesh-ctl-plane-namespace" }}
+spec:
+  members:
+    - {{ index .Values "local-mesh-bookinfo-namespace" }}

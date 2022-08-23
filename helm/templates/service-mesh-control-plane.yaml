@@ -1,0 +1,70 @@
+apiVersion: maistra.io/v2
+kind: ServiceMeshControlPlane
+metadata:
+  name: {{ index .Values "local-mesh-name" }}
+  namespace: {{ index .Values "local-mesh-ctl-plane-namespace" }}
+spec:
+  version: {{ index .Values "local-mesh-version" }}
+  cluster:
+    name: {{ index .Values "local-mesh-name" }}
+  addons:
+    grafana:
+      enabled: true
+    jaeger:
+      install:
+        storage:
+          type: Memory
+    kiali:
+      enabled: true
+    prometheus:
+      enabled: true
+  policy:
+    type: Istiod
+  telemetry:
+    type: Istiod
+  tracing:
+    sampling: 10000
+    type: Jaeger
+  runtime:
+    defaults:
+      container:
+        imagePullPolicy: Always
+  proxy:
+    accessLogging:
+      file:
+        name: /dev/stdout
+  gateways:
+    additionalEgress:
+      {{ index .Values "remote-mesh-name" }}-egress:
+        enabled: true
+        requestedNetworkView:
+        - network-{{ index .Values "remote-mesh-name" }}
+        routerMode: sni-dnat
+        service:
+          metadata:
+            labels:
+              federation.maistra.io/egress-for: {{ index .Values "remote-mesh-name" }}
+          ports:
+          - port: 15443
+            name: tls
+          - port: 8188
+            name: http-discovery
+    additionalIngress:
+      {{ index .Values "remote-mesh-name" }}-ingress:
+        enabled: true
+        routerMode: sni-dnat
+        service:
+          type: NodePort
+          metadata:
+            labels:
+              federation.maistra.io/ingress-for: {{ index .Values "remote-mesh-name" }}
+          ports:
+          - port: 15443
+            name: tls
+            nodePort: {{ index .Values "local-mesh-ingress-gateway-nodeport-tls-port-number" }}
+          - port: 8188
+            name: https-discovery
+            nodePort: {{ index .Values "local-mesh-ingress-gateway-nodeport-https-discovery-port-number" }}
+  security:
+    trust:
+      domain: {{ index .Values "local-mesh-name" }}.local

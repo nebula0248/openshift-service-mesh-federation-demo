@@ -1,0 +1,36 @@
+# This Helm values are for your 2nd OpenShift Cluster. Adjust the values according
+# to you own environment. REMEMBER to also update the values for 1st OpenShift cluster
+# in the values-cluster-1.yaml file.
+#
+# Notes:
+#
+# 1.  Since the service mesh will dynamically generate other K8S objects based 
+#     on your mesh name, and such name will be prefixed with some strings which
+#     cannot exceed certain amount of characters. Thus, suggest not to have a 
+#     mesh name more than 8 characters.
+#
+# 2.  You may change mesh version to a newer version if available and if compatible.
+# 
+# 3.  For nodeport, be aware that you must pick a port number which is above 30000
+#     and cannot be in used.
+#
+# 4.  remote-mesh.peering-addresses is an array list. You may list all the IP 
+#     addresses of your worker nodes which has nodeport exposed, or other FQDNS 
+#     like public cloud load balancers.
+
+local-mesh-name: spoke-1
+local-mesh-version: v2.2
+local-mesh-ctl-plane-namespace: peter-svc-mesh-ctl-plane
+local-mesh-bookinfo-namespace: peter-svc-mesh-bookinfo
+local-mesh-ingress-gateway-nodeport-tls-port-number: 30443
+local-mesh-ingress-gateway-nodeport-https-discovery-port-number: 30188 
+
+remote-mesh-name: hub
+remote-mesh-peering-addresses:
+  - 192.168.1.10
+  - 192.168.1.11
+  - 192.168.1.12
+remote-mesh-ctl-plane-namespace: peter-svc-mesh-ctl-plane
+remote-mesh-ingress-gateway-nodeport-tls-port-number: 30443
+remote-mesh-ingress-gateway-nodeport-https-discovery-port-number: 30188
+remote-mesh-root-cert-configmap-name: hub-ca-root-cert
