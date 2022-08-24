@@ -18,17 +18,18 @@
 #     addresses of your worker nodes which has nodeport exposed, or other FQDNS 
 #     like public cloud load balancers.
 
-local-mesh-name: hub
+local-mesh-name: cl1
 local-mesh-version: v2.2
-local-mesh-ctl-plane-namespace: peter-svc-mesh-ctl-plane
-local-mesh-bookinfo-namespace: peter-svc-mesh-bookinfo
+local-mesh-ctl-plane-namespace: cl1-mesh-ctl-plane
+local-mesh-bookinfo-namespace: cl1-mesh-bookinfo
 local-mesh-ingress-gateway-nodeport-tls-port-number: 30443
 local-mesh-ingress-gateway-nodeport-https-discovery-port-number: 30188 
 
-remote-mesh-name: spoke-1
+remote-mesh-name: cl2
 remote-mesh-peering-addresses:
   - 192.168.1.112
-remote-mesh-ctl-plane-namespace: peter-svc-mesh-ctl-plane
+remote-mesh-ctl-plane-namespace: cl2-mesh-ctl-plane
+remote-mesh-bookinfo-namespace: cl2-mesh-bookinfo
 remote-mesh-ingress-gateway-nodeport-tls-port-number: 30443
 remote-mesh-ingress-gateway-nodeport-https-discovery-port-number: 30188
-remote-mesh-root-cert-configmap-name: spoke-1-ca-root-cert
+remote-mesh-root-cert-configmap-name: cl2-ca-root-cert

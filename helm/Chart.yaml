@@ -1,6 +1,6 @@
 apiVersion: v2
 
-name: OpenShift Service Mesh Federation Demo (Cross Cluster Scenario)
+name: OpenShift Service Mesh Federation Demo
 
 description: A Helm chart for Kubernetes
 

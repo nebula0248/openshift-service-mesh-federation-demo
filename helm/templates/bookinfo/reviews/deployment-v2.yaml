@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reviews-v2
+  namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+  labels:
+    app: reviews
+    version: v2
+    app.openshift.io/runtime: java
+    app.kubernetes.io/part-of: reviews
+  annotations:
+    app.openshift.io/connects-to: '[{"apiVersion":"apps/v1","kind":"Deployment","name":"ratings-v1"}]'
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: reviews
+      version: v2
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: reviews
+        version: v2
+    spec:
+      serviceAccountName: bookinfo-reviews
+      containers:
+      - name: reviews
+        image: quay.io/maistra/examples-bookinfo-reviews-v2:2.2.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: LOG_DIR
+          value: "/tmp/logs"
+        ports:
+        - containerPort: 9080
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+        - name: wlp-output
+          mountPath: /opt/ibm/wlp/output
+      volumes:
+      - name: wlp-output
+        emptyDir: {}
+      - name: tmp
+        emptyDir: {}

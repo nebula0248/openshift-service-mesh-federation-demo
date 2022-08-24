@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: random-http-traffic-generator
+  namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+  labels:
+    app: random-http-traffic-generator
+    app.openshift.io/runtime: other-linux
+    app.kubernetes.io/part-of: traffic-generator
+  annotations:
+    app.openshift.io/connects-to: >-
+      [{"apiVersion":"apps/v1","kind":"Deployment","name":"productpage-v1"}]
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: random-http-traffic-generator
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels:
+        app: random-http-traffic-generator
+    spec:
+      containers:
+      - name: random-http-traffic-generator
+        image: quay.io/nebula0248/random-http-traffic-generator:v1.0
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: ENV_MAXIMUM_RANDOM_WAIT_TIME
+            value: '3'
+          - name: ENV_CURL_URL
+            value: '' # To be replaced by script

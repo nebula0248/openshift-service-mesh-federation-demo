@@ -5,13 +5,13 @@
 #       Variable, update based on your needs        #
 #                                                   #
 #####################################################
-CLUSTER_1_OCP_SERVER_URL="https://api.XXXXXX:6443"
+CLUSTER_1_OCP_SERVER_URL="https://api.YOUR_OCP_CLUSTER1:6443"
 CLUSTER_1_OCP_TOKEN="sha256~XXXXX"
 
-CLUSTER_2_OCP_SERVER_URL="https://api.XXXXXX:6443"
-CLUSTER_2_OCP_TOKEN="sha256~XXXXXX"
+CLUSTER_2_OCP_SERVER_URL="https://api.YOUR_OCP_CLUSTER2:6443"
+CLUSTER_2_OCP_TOKEN="sha256~XXXXX"
 
-HELM_RELEASE_TO_BE_STORED_NAMESPACE="default"
+HELM_RELEASE_TO_BE_STORED_NAMESPACE="default" # Make sure you have this namepspace pre-created in your cluster.
 HELM_RELEASE_NAME="ossm-federation-demo"
 
 
@@ -26,12 +26,16 @@ CLUSTER_1_ISTIO_CTL_PLANE_NAME=$(grep "local-mesh-name" ./helm/values-cluster-1.
 CLUSTER_2_ISTIO_CTL_PLANE_NAME=$(grep "local-mesh-name" ./helm/values-cluster-2.yaml | sed 's/local-mesh-name: //')
 CLUSTER_1_REMOTE_ISTIO_ROOT_CERT_CONFIGMAP=$(grep "remote-mesh-root-cert-configmap-name" ./helm/values-cluster-1.yaml | sed 's/remote-mesh-root-cert-configmap-name: //')
 CLUSTER_2_REMOTE_ISTIO_ROOT_CERT_CONFIGMAP=$(grep "remote-mesh-root-cert-configmap-name" ./helm/values-cluster-2.yaml | sed 's/remote-mesh-root-cert-configmap-name: //')
+CLUSTER_1_BOOKINFO_NS=$(grep "local-mesh-bookinfo-namespace" ./helm/values-cluster-1.yaml | sed 's/local-mesh-bookinfo-namespace: //')
+CLUSTER_2_BOOKINFO_NS=$(grep "local-mesh-bookinfo-namespace" ./helm/values-cluster-2.yaml | sed 's/local-mesh-bookinfo-namespace: //')
 
 
-install_demo() {
+install_demo () {
     local TIME_COUNTER
     local CLUSTER_1_ISTIO_ROOT_CERT
     local CLUSTER_2_ISTIO_ROOT_CERT
+    local CLUSTER_1_ISTIO_INGRESSGW_URL
+    local CLUSTER_2_ISTIO_INGRESSGW_URL
     
     # Install the Helm resources in cluster 1
     echo_bold "Trying to install Helm chart in Cluster 1..."
@@ -44,7 +48,7 @@ install_demo() {
     TIME_COUNTER=1
     while true; do
         sleep 1
-        if [ $(oc get ServiceMeshControlPlane ${CLUSTER_1_ISTIO_CTL_PLANE_NAME} -n ${CLUSTER_1_ISTIO_CTL_PLANE_NS} -o "jsonpath={.status.conditions[0].reason}") = "InstallSuccessful" ]; then
+        if [ $(oc get ServiceMeshControlPlane ${CLUSTER_1_ISTIO_CTL_PLANE_NAME} -n ${CLUSTER_1_ISTIO_CTL_PLANE_NS} -o "jsonpath={.status.conditions[0].reason}") == "InstallSuccessful" ]; then
             printf "\tService mesh at cluster 1 installed successfully!\n\n"
             break
         else
@@ -72,7 +76,7 @@ install_demo() {
     TIME_COUNTER=1
     while true; do
         sleep 1
-        if [ $(oc get ServiceMeshControlPlane ${CLUSTER_2_ISTIO_CTL_PLANE_NAME} -n ${CLUSTER_2_ISTIO_CTL_PLANE_NS} -o "jsonpath={.status.conditions[0].reason}") = "InstallSuccessful" ]; then
+        if [ $(oc get ServiceMeshControlPlane ${CLUSTER_2_ISTIO_CTL_PLANE_NAME} -n ${CLUSTER_2_ISTIO_CTL_PLANE_NS} -o "jsonpath={.status.conditions[0].reason}") == "InstallSuccessful" ]; then
             printf "\tService mesh at cluster 2 installed successfully!\n\n"
             break
         else
@@ -103,7 +107,30 @@ install_demo() {
     # Complete, delete those temp files
     rm temp-cluster-1-istio-root-cert.pem
     rm temp-cluster-2-istio-root-cert.pem
-    echo_bold "Completed. Please check you OpenShift Service Mesh Federation installation."
+    echo_bold "OSSM and bookinfo app installation completed. You may now check the status of your ServiceMeshPeer objects to make sure the federation is established."
+    printf "\n"
+
+    # Scale all bookinfo namespace pods up and get the product page URL
+    echo_bold "Prepare bookinfo application for cluster 1..."
+    run_and_log "oc login --token=$CLUSTER_1_OCP_TOKEN --server=$CLUSTER_1_OCP_SERVER_URL"
+    CLUSTER_1_ISTIO_INGRESSGW_URL="http://$(oc get route istio-ingressgateway -n $CLUSTER_1_ISTIO_CTL_PLANE_NS -o 'jsonpath={.spec.host}')"
+    run_and_log "oc set env deployment/random-http-traffic-generator -n $CLUSTER_1_BOOKINFO_NS ENV_CURL_URL=$CLUSTER_1_ISTIO_INGRESSGW_URL/productpage" # Make the traffic generator call the Istio gateway
+    run_and_log "oc scale deployment -n $CLUSTER_1_BOOKINFO_NS --replicas=1 --all" # Start all deployments
+
+    echo_bold "Prepare bookinfo application for cluster 2..."
+    run_and_log "oc login --token=$CLUSTER_2_OCP_TOKEN --server=$CLUSTER_2_OCP_SERVER_URL"
+    CLUSTER_2_ISTIO_INGRESSGW_URL="http://$(oc get route istio-ingressgateway -n $CLUSTER_2_ISTIO_CTL_PLANE_NS -o 'jsonpath={.spec.host}')"
+    run_and_log "oc set env deployment/random-http-traffic-generator -n $CLUSTER_2_BOOKINFO_NS ENV_CURL_URL=$CLUSTER_2_ISTIO_INGRESSGW_URL/productpage" # Make the traffic generator call the Istio gateway
+    run_and_log "oc scale deployment -n $CLUSTER_2_BOOKINFO_NS --replicas=1 --all" # Start all deployments
+
+    # All completed
+    echo_bold "********************************* Installation completed! ****************************************"
+    echo_bold "You may now check your ServiceMeshPeer status to confirm the connectivities between meshes are up."
+    echo_bold "The traffic generator will continuously call your Bookinfo application to simulate traffic."
+    echo_bold "You may scale out the traffic generator if needed, or scale down deployments to simulate failure."
+    printf "\n"
+    echo "Cluster 1's Bookinfo App: $CLUSTER_1_ISTIO_INGRESSGW_URL/productpage"
+    echo "Cluster 2's Bookinfo App: $CLUSTER_2_ISTIO_INGRESSGW_URL/productpage"
 }
 
 uninstall_demo () {
@@ -137,17 +164,12 @@ run_and_log() {
     printf "\n"
 }
 
-printf "Please enter the option number to select: \n"
-printf "\t1. Install the demo resources\n"
-printf "\t2. Uninstall the demo resources\n"
-read -p "Please input: " option_number
-
-if [ $option_number == 1 ]
+if [[ ! -z "$1" ]] && [[ "$1" == "install" ]]
 then
     install_demo
-elif [ $option_number == 2 ]
+elif [[ ! -z "$1" ]] && [[ "$1" == "uninstall" ]]
 then
     uninstall_demo
 else
-    echo "ERROR: Unknown option number. Please run again and enter a correct number."
+    echo "ERROR: Please provide input parameter (install / uninstall)"
 fi

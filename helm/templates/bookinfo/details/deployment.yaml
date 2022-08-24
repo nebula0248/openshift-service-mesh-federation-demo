@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: details-v1
+  namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+  labels:
+    app: details
+    version: v1
+    app.openshift.io/runtime: ruby
+    app.kubernetes.io/part-of: details
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: details
+      version: v1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: details
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-details
+      containers:
+      - name: details
+        image: quay.io/maistra/examples-bookinfo-details-v1:2.2.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9080

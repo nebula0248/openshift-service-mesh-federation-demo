@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ratings-v1
+  namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+  labels:
+    app: ratings
+    version: v1
+    app.openshift.io/runtime: nodejs
+    app.kubernetes.io/part-of: ratings
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: ratings
+      version: v1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: ratings
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-ratings
+      containers:
+      - name: ratings
+        image: quay.io/maistra/examples-bookinfo-ratings-v1:2.2.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9080

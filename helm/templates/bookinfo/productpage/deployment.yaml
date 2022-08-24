@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: productpage-v1
+  namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+  labels:
+    app: productpage
+    version: v1
+    app.openshift.io/runtime: python
+    app.kubernetes.io/part-of: productpage
+  annotations:
+    app.openshift.io/connects-to: >-
+      [{"apiVersion":"apps/v1","kind":"Deployment","name":"details-v1"},{"apiVersion":"apps/v1","kind":"Deployment","name":"reviews-v2"},{"apiVersion":"apps/v1","kind":"Deployment","name":"reviews-v1"},{"apiVersion":"apps/v1","kind":"Deployment","name":"reviews-v3"}]
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: productpage
+      version: v1
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "true"
+      labels:
+        app: productpage
+        version: v1
+    spec:
+      serviceAccountName: bookinfo-productpage
+      containers:
+      - name: productpage
+        image: quay.io/maistra/examples-bookinfo-productpage-v1:2.2.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9080
+        volumeMounts:
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: tmp
+        emptyDir: {}

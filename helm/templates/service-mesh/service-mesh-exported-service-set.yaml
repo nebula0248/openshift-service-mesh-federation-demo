@@ -1,0 +1,35 @@
+kind: ExportedServiceSet
+apiVersion: federation.maistra.io/v1
+metadata:
+ name: {{ index .Values "remote-mesh-name" }}
+ namespace: {{ index .Values "local-mesh-ctl-plane-namespace" }}
+spec:
+ exportRules:
+  - type: NameSelector
+    nameSelector:
+      namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+      name: productpage
+      alias:
+        namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+        name: productpage
+  - type: NameSelector
+    nameSelector:
+      namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+      name: details
+      alias:
+        namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+        name: details
+  - type: NameSelector
+    nameSelector:
+      namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+      name: reviews
+      alias:
+        namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+        name: reviews
+  - type: NameSelector
+    nameSelector:
+      namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+      name: ratings
+      alias:
+        namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+        name: ratings

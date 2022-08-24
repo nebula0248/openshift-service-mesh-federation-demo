@@ -1,0 +1,41 @@
+apiVersion: federation.maistra.io/v1
+kind: ImportedServiceSet
+metadata:
+ name: {{ index .Values "remote-mesh-name" }}
+ namespace: {{ index .Values "local-mesh-ctl-plane-namespace" }}
+spec:
+ locality:
+  region: {{ index .Values "remote-mesh-name" }}
+ importRules:
+  - type: NameSelector
+    importAsLocal: true
+    nameSelector:
+      namespace: {{ index .Values "remote-mesh-bookinfo-namespace" }}
+      name: productpage
+      alias:
+        namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+        name: productpage
+  - type: NameSelector
+    importAsLocal: true
+    nameSelector:
+      namespace: {{ index .Values "remote-mesh-bookinfo-namespace" }}
+      name: details
+      alias:
+        namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+        name: details
+  - type: NameSelector
+    importAsLocal: true
+    nameSelector:
+      namespace: {{ index .Values "remote-mesh-bookinfo-namespace" }}
+      name: reviews
+      alias:
+        namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+        name: reviews
+  - type: NameSelector
+    importAsLocal: true
+    nameSelector:
+      namespace: {{ index .Values "remote-mesh-bookinfo-namespace" }}
+      name: ratings
+      alias:
+        namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+        name: ratings

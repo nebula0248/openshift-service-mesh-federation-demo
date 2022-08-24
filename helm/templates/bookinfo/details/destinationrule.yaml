@@ -1,0 +1,22 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: details
+  namespace: {{ index .Values "local-mesh-bookinfo-namespace" }}
+spec:
+  host: details
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  trafficPolicy:
+    loadBalancer:
+      localityLbSetting:
+        enabled: true
+        failover:
+          - from: {{ index .Values "local-mesh-name" }}
+            to: {{ index .Values "remote-mesh-name" }}
+    outlierDetection:
+      consecutive5xxErrors: 3
+      interval: 10s
+      baseEjectionTime: 1m
