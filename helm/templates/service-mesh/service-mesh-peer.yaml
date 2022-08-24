@@ -6,11 +6,19 @@ metadata:
 spec:
  remote:
    addresses:
-   {{- range index .Values "remote-mesh-peering-addresses" }}
+   {{- if eq (index .Values "local-and-remote-connectivity-method") "ClusterIP" }}
+     - {{ index .Values "local-mesh-name"}}-ingress.{{ index .Values "remote-mesh-ctl-plane-namespace"}}.svc.cluster.local
+   discoveryPort: 8188
+   servicePort: 15443
+   {{- else if eq (index .Values "local-and-remote-connectivity-method") "NodePort" }}
+     {{- range index .Values "remote-mesh-peering-addresses" }}
      - {{ . | quote }}
-   {{- end }}
+     {{- end }}
    discoveryPort: {{ index .Values "remote-mesh-ingress-gateway-nodeport-https-discovery-port-number" }}
    servicePort: {{ index .Values "remote-mesh-ingress-gateway-nodeport-tls-port-number" }}
+   {{- else if eq (index .Values "local-and-remote-connectivity-method") "LoadBalancer" }}
+     {{- fail "LOAD BALANCER TYPE IS NOT IMPLEMENTED!!!!!!!!!" }}
+   {{- end }}
  gateways:
    ingress:
      name: {{ index .Values "remote-mesh-name" }}-ingress

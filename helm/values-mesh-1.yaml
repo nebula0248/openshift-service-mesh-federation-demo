@@ -1,0 +1,83 @@
+# This Helm values are for your 1st OpenShift Service Mesh. Adjust the values according
+# to you own environment. REMEMBER to also update the values for 2nd OpenShift Service
+# Mesh in the values-mesh-2.yaml file.
+#
+# Notes:
+#
+# 1.  Since the service mesh will dynamically generate other K8S objects based 
+#     on your mesh name, and such name will be prefixed with some strings which
+#     cannot exceed certain amount of characters. Thus, suggest NOT to have a 
+#     mesh name more than 8 characters.
+#
+# 2.  You may change mesh version to a newer version if available and if compatible.
+
+local-mesh-name: mesh1
+local-mesh-version: v2.2
+local-mesh-ctl-plane-namespace: mesh1-ctl-plane
+local-mesh-bookinfo-namespace: mesh1-bookinfo
+
+remote-mesh-name: mesh2
+remote-mesh-ctl-plane-namespace: mesh2-ctl-plane
+remote-mesh-bookinfo-namespace: mesh2-bookinfo
+remote-mesh-root-cert-configmap-name: mesh2-ca-root-cert
+
+
+# Type 1:
+# Enable the followings if you intent to use ClusterIP (usually both meshes are in
+# the same OpenShift cluster) for federation gateway exposure. Comment out the 
+# followings if you DO NOT use ClusterIP.
+#
+# Notes:
+#
+# 1.  If you are installion both service meshes within the same OpenShift, please
+#     ensure that the local mesh namespaces (both control plane and bookinfo) and remote
+#     mesh namespaces are NOT the same.
+#
+# 2.  This value must be the same across values-mesh-1.yaml and values-mesh-2.yaml.
+#     (In reality, you could have one end using one type, the other end using another type.
+#     However, to make the demo easier, we assume both ends are using the same type.)
+
+local-and-remote-connectivity-method: ClusterIP
+
+
+# Type 2:
+# Enable the followings if you intent to use Load Balancer (usually for 2 clusters on 
+# public clouds) for federation gateway exposure. Comment out the followings if 
+# you DO NOT use Load Balancer.
+#
+# Notes:
+#
+# 1.  This value must be the same across values-mesh-1.yaml and values-mesh-2.yaml.
+#     (In reality, you could have one end using one type, the other end using another type.
+#     However, to make the demo easier, we assume both ends are using the same type.)
+
+# local-and-remote-connectivity-method: LoadBalancer
+
+
+# Type 3:
+# Enable the followings if you intent to use NodePort (usually on-premises 
+# environment) for federation gateway exposure. Comment out the followings
+# if you DO NOT use NodePort.
+#   
+# Notes:
+#   
+# 1.  If you use NodePort, the peering addresses might be your worker node IP or FQDN.
+#     Make sure there are no firewall rules that block the port access.
+#
+# 2.  For NodePort numbers, be aware that you must pick a port number which is above 30000
+#     and cannot be in used.
+#
+# 3.  remote-mesh.peering-addresses is an array list. You may list all the IP 
+#     addresses or FQDN of your worker nodes which has nodeport exposed.
+#
+# 4.  This value must be the same across values-mesh-1.yaml and values-mesh-2.yaml.
+#     (In reality, you could have one end using one type, the other end using another type.
+#     However, to make the demo easier, we assume both ends are using the same type.)
+
+# local-and-remote-connectivity-method: NodePort
+# local-mesh-ingress-gateway-nodeport-tls-port-number: 30443
+# local-mesh-ingress-gateway-nodeport-https-discovery-port-number: 30188 
+# remote-mesh-ingress-gateway-nodeport-tls-port-number: 30443
+# remote-mesh-ingress-gateway-nodeport-https-discovery-port-number: 30188
+# remote-mesh-peering-addresses:
+#   - 192.168.1.112

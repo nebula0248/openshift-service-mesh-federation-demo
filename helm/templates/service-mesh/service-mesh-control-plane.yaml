@@ -54,17 +54,29 @@ spec:
         enabled: true
         routerMode: sni-dnat
         service:
+          {{- if eq (index .Values "local-and-remote-connectivity-method") "ClusterIP" }}
+          type: ClusterIP
+          {{- else if eq (index .Values "local-and-remote-connectivity-method") "NodePort" }}
           type: NodePort
+          {{- else if eq (index .Values "local-and-remote-connectivity-method") "LoadBalancer" }}
+          type: LoadBalancer
+          {{- else }}
+          {{- fail "Invalid value for local-and-remote-connectivity-method in Helm chart." }}
+          {{- end }}
           metadata:
             labels:
               federation.maistra.io/ingress-for: {{ index .Values "remote-mesh-name" }}
           ports:
           - port: 15443
             name: tls
+            {{- if eq (index .Values "local-and-remote-connectivity-method") "NodePort" }}
             nodePort: {{ index .Values "local-mesh-ingress-gateway-nodeport-tls-port-number" }}
+            {{- end }}
           - port: 8188
             name: https-discovery
+            {{- if eq (index .Values "local-and-remote-connectivity-method") "NodePort" }}
             nodePort: {{ index .Values "local-mesh-ingress-gateway-nodeport-https-discovery-port-number" }}
+            {{- end }}
   security:
     trust:
       domain: {{ index .Values "local-mesh-name" }}.local
