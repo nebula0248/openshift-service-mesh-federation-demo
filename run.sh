@@ -11,10 +11,10 @@ MESH_1_OCP_TOKEN="sha256~XXX"
 MESH_2_OCP_SERVER_URL="https://api.XXX:6443"
 MESH_2_OCP_TOKEN="sha256~XXX"
 
-MESH_1_HELM_RELEASE_TO_BE_STORED_NAMESPACE="default" # Make sure you have this namepspace pre-created in your Mesh 1 OCP cluster.
+MESH_1_HELM_RELEASE_TO_BE_STORED_NAMESPACE="default" # Make sure you have this namespace pre-created in your Mesh 1 OCP cluster.
 MESH_1_HELM_RELEASE_NAME="ossm-federation-demo-mesh-1"
 
-MESH_2_HELM_RELEASE_TO_BE_STORED_NAMESPACE="default" # Make sure you have this namepspace pre-created in your Mehs 2 OCP cluster.
+MESH_2_HELM_RELEASE_TO_BE_STORED_NAMESPACE="default" # Make sure you have this namespace pre-created in your Mesh 2 OCP cluster.
 MESH_2_HELM_RELEASE_NAME="ossm-federation-demo-mesh-2"
 
 
