@@ -5,16 +5,16 @@
 #       Variable, update based on your needs        #
 #                                                   #
 #####################################################
-MESH_1_OCP_SERVER_URL="https://api.XXX:6443"
-MESH_1_OCP_TOKEN="sha256~XXX"
+MESH_1_OCP_SERVER_URL="https://XXXXX"
+MESH_1_OCP_TOKEN="XXXXX"
 
-MESH_2_OCP_SERVER_URL="https://api.XXX:6443"
-MESH_2_OCP_TOKEN="sha256~XXX"
+MESH_2_OCP_SERVER_URL="https://XXXXX"
+MESH_2_OCP_TOKEN="XXXXX"
 
-MESH_1_HELM_RELEASE_TO_BE_STORED_NAMESPACE="default" # Make sure you have this namespace pre-created in your Mesh 1 OCP cluster.
+MESH_1_HELM_RELEASE_TO_BE_STORED_NAMESPACE="ossm-demo" # Make sure you have this namespace pre-created in your Mesh 1 OCP cluster.
 MESH_1_HELM_RELEASE_NAME="ossm-federation-demo-mesh-1"
 
-MESH_2_HELM_RELEASE_TO_BE_STORED_NAMESPACE="default" # Make sure you have this namespace pre-created in your Mesh 2 OCP cluster.
+MESH_2_HELM_RELEASE_TO_BE_STORED_NAMESPACE="ossm-demo" # Make sure you have this namespace pre-created in your Mesh 2 OCP cluster.
 MESH_2_HELM_RELEASE_NAME="ossm-federation-demo-mesh-2"
 
 
@@ -23,15 +23,20 @@ MESH_2_HELM_RELEASE_NAME="ossm-federation-demo-mesh-2"
 #        Internal variables, do not modify          #
 #                                                   #
 #####################################################
-MESH_1_ISTIO_CTL_PLANE_NS=$(grep "local-mesh-ctl-plane-namespace" ./helm/values-mesh-1.yaml | sed 's/local-mesh-ctl-plane-namespace: //')
-MESH_2_ISTIO_CTL_PLANE_NS=$(grep "local-mesh-ctl-plane-namespace" ./helm/values-mesh-2.yaml | sed 's/local-mesh-ctl-plane-namespace: //')
-MESH_1_ISTIO_CTL_PLANE_NAME=$(grep "local-mesh-name" ./helm/values-mesh-1.yaml | sed 's/local-mesh-name: //')
-MESH_2_ISTIO_CTL_PLANE_NAME=$(grep "local-mesh-name" ./helm/values-mesh-2.yaml | sed 's/local-mesh-name: //')
-MESH_1_REMOTE_ISTIO_ROOT_CERT_CONFIGMAP=$(grep "remote-mesh-root-cert-configmap-name" ./helm/values-mesh-1.yaml | sed 's/remote-mesh-root-cert-configmap-name: //')
-MESH_2_REMOTE_ISTIO_ROOT_CERT_CONFIGMAP=$(grep "remote-mesh-root-cert-configmap-name" ./helm/values-mesh-2.yaml | sed 's/remote-mesh-root-cert-configmap-name: //')
-MESH_1_BOOKINFO_NS=$(grep "local-mesh-bookinfo-namespace" ./helm/values-mesh-1.yaml | sed 's/local-mesh-bookinfo-namespace: //')
-MESH_2_BOOKINFO_NS=$(grep "local-mesh-bookinfo-namespace" ./helm/values-mesh-2.yaml | sed 's/local-mesh-bookinfo-namespace: //')
-
+MESH_1_ISTIO_CTL_PLANE_NS=$(grep "^local-mesh-ctl-plane-namespace" ./helm/values-mesh-1.yaml | sed 's/local-mesh-ctl-plane-namespace: //')
+MESH_2_ISTIO_CTL_PLANE_NS=$(grep "^local-mesh-ctl-plane-namespace" ./helm/values-mesh-2.yaml | sed 's/local-mesh-ctl-plane-namespace: //')
+MESH_1_ISTIO_CTL_PLANE_NAME=$(grep "^local-mesh-name" ./helm/values-mesh-1.yaml | sed 's/local-mesh-name: //')
+MESH_2_ISTIO_CTL_PLANE_NAME=$(grep "^local-mesh-name" ./helm/values-mesh-2.yaml | sed 's/local-mesh-name: //')
+MESH_1_REMOTE_ISTIO_ROOT_CERT_CONFIGMAP=$(grep "^remote-mesh-root-cert-configmap-name" ./helm/values-mesh-1.yaml | sed 's/remote-mesh-root-cert-configmap-name: //')
+MESH_2_REMOTE_ISTIO_ROOT_CERT_CONFIGMAP=$(grep "^remote-mesh-root-cert-configmap-name" ./helm/values-mesh-2.yaml | sed 's/remote-mesh-root-cert-configmap-name: //')
+MESH_1_BOOKINFO_NS=$(grep "^local-mesh-bookinfo-namespace" ./helm/values-mesh-1.yaml | sed 's/local-mesh-bookinfo-namespace: //')
+MESH_2_BOOKINFO_NS=$(grep "^local-mesh-bookinfo-namespace" ./helm/values-mesh-2.yaml | sed 's/local-mesh-bookinfo-namespace: //')
+MESH_1_LOCAL_AND_REMOTE_CONNECTIVITY_METHOD=$(grep "^local-and-remote-connectivity-method" ./helm/values-mesh-1.yaml | sed 's/local-and-remote-connectivity-method: //')
+MESH_2_LOCAL_AND_REMOTE_CONNECTIVITY_METHOD=$(grep "^local-and-remote-connectivity-method" ./helm/values-mesh-2.yaml | sed 's/local-and-remote-connectivity-method: //')
+MESH_1_LOCAL_MESH_OPENSHIFT_CLOUD_PROVIDER=$(grep "^local-mesh-openshift-cloud-provider" ./helm/values-mesh-1.yaml | sed 's/local-mesh-openshift-cloud-provider: //')
+MESH_2_LOCAL_MESH_OPENSHIFT_CLOUD_PROVIDER=$(grep "^local-mesh-openshift-cloud-provider" ./helm/values-mesh-2.yaml | sed 's/local-mesh-openshift-cloud-provider: //')
+MESH_1_REMOTE_MESH_NAME=$(grep "^remote-mesh-name" ./helm/values-mesh-1.yaml | sed 's/remote-mesh-name: //')
+MESH_2_REMOTE_MESH_NAME=$(grep "^remote-mesh-name" ./helm/values-mesh-2.yaml | sed 's/remote-mesh-name: //')
 
 install_demo () {
     local TIME_COUNTER
@@ -39,6 +44,15 @@ install_demo () {
     local MESH_2_ISTIO_ROOT_CERT
     local MESH_1_ISTIO_INGRESSGW_URL
     local MESH_2_ISTIO_INGRESSGW_URL
+    local MESH_1_LOAD_BALANCER_MESH_INGRESSGW_URL
+    local MESH_2_LOAD_BALANCER_MESH_INGRESSGW_URL
+
+    # Check if both meshes are using the same connectivity method to connect (just to simplify the demo)
+    if [[ "$MESH_1_LOCAL_AND_REMOTE_CONNECTIVITY_METHOD" != "$MESH_2_LOCAL_AND_REMOTE_CONNECTIVITY_METHOD" ]]
+    then
+        echo_bold "ERROR: To make the demo simple, we do not allow meshes to have different ways to peer. Make sure both meshes has the same local-and-remote-connectivity-method value set in Helm chart."
+        return -1
+    fi
     
     # Install the Helm resources for mesh 1
     echo_bold "Trying to install Helm chart for mesh 1..."
@@ -68,6 +82,36 @@ install_demo () {
     echo "${MESH_1_ISTIO_ROOT_CERT}" > temp-mesh-1-istio-root-cert.pem
     printf "\n"
 
+    # If it runs on public cloud and use LoadBalancer to expose mesh ingress gateway, obtain the dynamically
+    # generated cloud load balancer URL and inject into ServiceMeshPeer object later
+    if [[ "$MESH_1_LOCAL_AND_REMOTE_CONNECTIVITY_METHOD" == "LoadBalancer" ]]
+    then
+        echo_bold "Trying to get mesh 1's ingress gateway cloud load balancer's URL..."
+
+        # For AWS
+        if [[ "$MESH_1_LOCAL_MESH_OPENSHIFT_CLOUD_PROVIDER" == "AWS" ]]
+        then
+            echo_bold "Getting the ingress gateway's URL from AWS..."
+            TIME_COUNTER=1
+            while true; do
+                sleep 1
+                MESH_1_LOAD_BALANCER_MESH_INGRESSGW_URL=$(oc get svc ${MESH_1_REMOTE_MESH_NAME}-ingress -n ${MESH_1_ISTIO_CTL_PLANE_NS} -o "jsonpath={.status.loadBalancer.ingress[0].hostname}")
+                if [[ "$MESH_1_LOAD_BALANCER_MESH_INGRESSGW_URL" == *"amazonaws.com" ]]; then
+                    printf "\tAWS Load Balancer URL obtained: $MESH_1_LOAD_BALANCER_MESH_INGRESSGW_URL\n\n"
+                    break
+                else
+                    printf "\tWaited ${TIME_COUNTER}s...\n"
+                    ((TIME_COUNTER=TIME_COUNTER+1))
+                fi
+            done
+        
+        # For Azure
+        elif [[ "$MESH_1_LOCAL_MESH_OPENSHIFT_CLOUD_PROVIDER" == "Azure" ]]
+        then
+            echo_bold "NOT IMPLEMENTED YET!!!!!"
+        fi
+    fi
+    
     # Install the Helm resources for mesh 2
     echo_bold "Trying to install Helm chart for mesh 2..."
     run_and_log "oc login --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
@@ -96,6 +140,36 @@ install_demo () {
     echo "${MESH_2_ISTIO_ROOT_CERT}" > temp-mesh-2-istio-root-cert.pem
     printf "\n"
 
+    # If it runs on public cloud and use LoadBalancer to expose mesh ingress gateway, obtain the dynamically
+    # generated cloud load balancer URL and inject into ServiceMeshPeer object later
+    if [[ "$MESH_2_LOCAL_AND_REMOTE_CONNECTIVITY_METHOD" == "LoadBalancer" ]]
+    then
+        echo_bold "Trying to get mesh 2's ingress gateway cloud load balancer's URL..."
+
+        # For AWS
+        if [[ "$MESH_2_LOCAL_MESH_OPENSHIFT_CLOUD_PROVIDER" == "AWS" ]]
+        then
+            echo_bold "Getting the ingress gateway's URL from AWS..."
+            TIME_COUNTER=1
+            while true; do
+                sleep 1
+                MESH_2_LOAD_BALANCER_MESH_INGRESSGW_URL=$(oc get svc ${MESH_2_REMOTE_MESH_NAME}-ingress -n ${MESH_2_ISTIO_CTL_PLANE_NS} -o "jsonpath={.status.loadBalancer.ingress[0].hostname}")
+                if [[ "$MESH_2_LOAD_BALANCER_MESH_INGRESSGW_URL" == *"amazonaws.com" ]]; then
+                    printf "\tAWS Load Balancer URL obtained: $MESH_2_LOAD_BALANCER_MESH_INGRESSGW_URL\n\n"
+                    break
+                else
+                    printf "\tWaited ${TIME_COUNTER}s...\n"
+                    ((TIME_COUNTER=TIME_COUNTER+1))
+                fi
+            done
+        
+        # For Azure
+        elif [[ "$MESH_2_LOCAL_MESH_OPENSHIFT_CLOUD_PROVIDER" == "Azure" ]]
+        then
+            echo_bold "NOT IMPLEMENTED YET!!!!!"
+        fi
+    fi
+
     # Exchange service meshes root CA certificates and create ConfigMap objects in the opposite remote meshes
     # Starts with mesh 1, save mesh 2's root cert as ConfigMap in mesh 1
     echo_bold "Inject mesh 2's Istio root cert into mesh 1..."
@@ -112,6 +186,23 @@ install_demo () {
     rm temp-mesh-2-istio-root-cert.pem
     echo_bold "OSSM and bookinfo app installation completed. You may now check the status of your ServiceMeshPeer objects to make sure the federation is established."
     printf "\n"
+
+    # If it runs on public cloud and use LoadBalancer to expose mesh ingress gateway, now is the time
+    # to inject back the cloud load balanacer URLs into both meshes
+    # This if statement only checkes mesh_1 value equality since we have made use mesh_1 and mesh_2
+    # connectivity method value must be the same
+    if [[ "$MESH_1_LOCAL_AND_REMOTE_CONNECTIVITY_METHOD" == "LoadBalancer" ]]
+    then
+        echo_bold "Now it is the time to inject the cloud load balancers' URL into both end meshes..."
+
+        echo_bold "Inject mesh 2's load balancer URL into mesh 1..."
+        run_and_log "oc login --token=$MESH_1_OCP_TOKEN --server=$MESH_1_OCP_SERVER_URL"
+        run_and_log "oc patch ServiceMeshPeer $MESH_1_REMOTE_MESH_NAME -n $MESH_1_ISTIO_CTL_PLANE_NS --type json -p '[{\"op\":\"replace\",\"path\":\"/spec/remote/addresses/0\",\"value\":\"$MESH_2_LOAD_BALANCER_MESH_INGRESSGW_URL\"}]'"
+
+        echo_bold "Inject mesh 1's load balancer URL into mesh 2..."
+        run_and_log "oc login --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
+        run_and_log "oc patch ServiceMeshPeer $MESH_2_REMOTE_MESH_NAME -n $MESH_2_ISTIO_CTL_PLANE_NS --type json -p '[{\"op\":\"replace\",\"path\":\"/spec/remote/addresses/0\",\"value\":\"$MESH_1_LOAD_BALANCER_MESH_INGRESSGW_URL\"}]'"
+    fi
 
     # Scale all bookinfo namespace pods up and get the product page URL
     echo_bold "Prepare bookinfo application for mesh 1..."

@@ -17,7 +17,9 @@ spec:
    discoveryPort: {{ index .Values "remote-mesh-ingress-gateway-nodeport-https-discovery-port-number" }}
    servicePort: {{ index .Values "remote-mesh-ingress-gateway-nodeport-tls-port-number" }}
    {{- else if eq (index .Values "local-and-remote-connectivity-method") "LoadBalancer" }}
-     {{- fail "LOAD BALANCER TYPE IS NOT IMPLEMENTED!!!!!!!!!" }}
+     - "will-be-replaced-by-run-shell-script"
+   discoveryPort: 8188
+   servicePort: 15443
    {{- end }}
  gateways:
    ingress:

@@ -37,7 +37,7 @@ remote-mesh-root-cert-configmap-name: mesh1-ca-root-cert
 #     (In reality, you could have one end using one type, the other end using another type.
 #     However, to make the demo easier, we assume both ends are using the same type.)
 
-local-and-remote-connectivity-method: ClusterIP
+# local-and-remote-connectivity-method: ClusterIP
 
 
 # Type 2:
@@ -50,8 +50,11 @@ local-and-remote-connectivity-method: ClusterIP
 # 1.  This value must be the same across values-mesh-1.yaml and values-mesh-2.yaml.
 #     (In reality, you could have one end using one type, the other end using another type.
 #     However, to make the demo easier, we assume both ends are using the same type.)
+#
+# 2.  local-mesh-openshift-cloud-provider values could be: {AWS, Azure}
 
-# local-and-remote-connectivity-method: LoadBalancer
+local-and-remote-connectivity-method: LoadBalancer
+local-mesh-openshift-cloud-provider: AWS
 
 
 # Type 3:
