@@ -5,11 +5,11 @@
 #       Variable, update based on your needs        #
 #                                                   #
 #####################################################
-MESH_1_OCP_SERVER_URL="https://XXXXX"
-MESH_1_OCP_TOKEN="XXXXX"
+MESH_1_OCP_SERVER_URL="https://XXXXX:6443"
+MESH_1_OCP_TOKEN="XXXXXX"
 
-MESH_2_OCP_SERVER_URL="https://XXXXX"
-MESH_2_OCP_TOKEN="XXXXX"
+MESH_2_OCP_SERVER_URL="https://XXXXX:6443"
+MESH_2_OCP_TOKEN="XXXXXX"
 
 MESH_1_HELM_RELEASE_TO_BE_STORED_NAMESPACE="ossm-demo" # Make sure you have this namespace pre-created in your Mesh 1 OCP cluster.
 MESH_1_HELM_RELEASE_NAME="ossm-federation-demo-mesh-1"
@@ -108,7 +108,19 @@ install_demo () {
         # For Azure
         elif [[ "$MESH_1_LOCAL_MESH_OPENSHIFT_CLOUD_PROVIDER" == "Azure" ]]
         then
-            echo_bold "NOT IMPLEMENTED YET!!!!!"
+            echo_bold "Getting the ingress gateway's URL from Azure..."
+            TIME_COUNTER=1
+            while true; do
+                sleep 1
+                MESH_1_LOAD_BALANCER_MESH_INGRESSGW_URL=$(oc get svc ${MESH_1_REMOTE_MESH_NAME}-ingress -n ${MESH_1_ISTIO_CTL_PLANE_NS} -o "jsonpath={.status.loadBalancer.ingress[0].ip}")
+                if [ ! -z "$MESH_1_LOAD_BALANCER_MESH_INGRESSGW_URL" ]; then
+                    printf "\tAzure Load Balancer URL obtained: $MESH_1_LOAD_BALANCER_MESH_INGRESSGW_URL\n\n"
+                    break
+                else
+                    printf "\tWaited ${TIME_COUNTER}s...\n"
+                    ((TIME_COUNTER=TIME_COUNTER+1))
+                fi
+            done
         fi
     fi
     
@@ -166,7 +178,19 @@ install_demo () {
         # For Azure
         elif [[ "$MESH_2_LOCAL_MESH_OPENSHIFT_CLOUD_PROVIDER" == "Azure" ]]
         then
-            echo_bold "NOT IMPLEMENTED YET!!!!!"
+            echo_bold "Getting the ingress gateway's URL from Azure..."
+            TIME_COUNTER=1
+            while true; do
+                sleep 1
+                MESH_2_LOAD_BALANCER_MESH_INGRESSGW_URL=$(oc get svc ${MESH_2_REMOTE_MESH_NAME}-ingress -n ${MESH_2_ISTIO_CTL_PLANE_NS} -o "jsonpath={.status.loadBalancer.ingress[0].ip}")
+                if [ ! -z "$MESH_2_LOAD_BALANCER_MESH_INGRESSGW_URL" ]; then
+                    printf "\tAzure Load Balancer URL obtained: $MESH_2_LOAD_BALANCER_MESH_INGRESSGW_URL\n\n"
+                    break
+                else
+                    printf "\tWaited ${TIME_COUNTER}s...\n"
+                    ((TIME_COUNTER=TIME_COUNTER+1))
+                fi
+            done
         fi
     fi
 

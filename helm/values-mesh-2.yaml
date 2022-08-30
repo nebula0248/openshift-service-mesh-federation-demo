@@ -54,7 +54,7 @@ remote-mesh-root-cert-configmap-name: mesh1-ca-root-cert
 # 2.  local-mesh-openshift-cloud-provider values could be: {AWS, Azure}
 
 local-and-remote-connectivity-method: LoadBalancer
-local-mesh-openshift-cloud-provider: AWS
+local-mesh-openshift-cloud-provider: Azure
 
 
 # Type 3:
