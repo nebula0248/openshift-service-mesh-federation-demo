@@ -5,16 +5,16 @@
 #       Variable, update based on your needs        #
 #                                                   #
 #####################################################
-MESH_1_OCP_SERVER_URL="https://XXXXX:6443"
-MESH_1_OCP_TOKEN="XXXXXX"
+MESH_1_OCP_SERVER_URL="https://XXXXX"
+MESH_1_OCP_TOKEN="sha256~XXXXX"
 
-MESH_2_OCP_SERVER_URL="https://XXXXX:6443"
-MESH_2_OCP_TOKEN="XXXXXX"
+MESH_2_OCP_SERVER_URL="https://XXXXX"
+MESH_2_OCP_TOKEN="sha256~XXXXX"
 
-MESH_1_HELM_RELEASE_TO_BE_STORED_NAMESPACE="ossm-demo" # Make sure you have this namespace pre-created in your Mesh 1 OCP cluster.
+MESH_1_HELM_RELEASE_TO_BE_STORED_NAMESPACE="peter-ossm-helm" # Make sure you have this namespace pre-created in your Mesh 1 OCP cluster.
 MESH_1_HELM_RELEASE_NAME="ossm-federation-demo-mesh-1"
 
-MESH_2_HELM_RELEASE_TO_BE_STORED_NAMESPACE="ossm-demo" # Make sure you have this namespace pre-created in your Mesh 2 OCP cluster.
+MESH_2_HELM_RELEASE_TO_BE_STORED_NAMESPACE="peter-ossm-helm" # Make sure you have this namespace pre-created in your Mesh 2 OCP cluster.
 MESH_2_HELM_RELEASE_NAME="ossm-federation-demo-mesh-2"
 
 
@@ -56,7 +56,7 @@ install_demo () {
     
     # Install the Helm resources for mesh 1
     echo_bold "Trying to install Helm chart for mesh 1..."
-    run_and_log "oc login --token=$MESH_1_OCP_TOKEN --server=$MESH_1_OCP_SERVER_URL"
+    run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_1_OCP_TOKEN --server=$MESH_1_OCP_SERVER_URL"
     run_and_log "oc project $MESH_1_HELM_RELEASE_TO_BE_STORED_NAMESPACE"
     run_and_log "helm install $MESH_1_HELM_RELEASE_NAME -f helm/values-mesh-1.yaml ./helm"
 
@@ -126,7 +126,7 @@ install_demo () {
     
     # Install the Helm resources for mesh 2
     echo_bold "Trying to install Helm chart for mesh 2..."
-    run_and_log "oc login --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
+    run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
     run_and_log "oc project $MESH_2_HELM_RELEASE_TO_BE_STORED_NAMESPACE"
     run_and_log "helm install $MESH_2_HELM_RELEASE_NAME -f helm/values-mesh-2.yaml ./helm"
 
@@ -197,12 +197,12 @@ install_demo () {
     # Exchange service meshes root CA certificates and create ConfigMap objects in the opposite remote meshes
     # Starts with mesh 1, save mesh 2's root cert as ConfigMap in mesh 1
     echo_bold "Inject mesh 2's Istio root cert into mesh 1..."
-    run_and_log "oc login --token=$MESH_1_OCP_TOKEN --server=$MESH_1_OCP_SERVER_URL"
+    run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_1_OCP_TOKEN --server=$MESH_1_OCP_SERVER_URL"
     run_and_log "oc create configmap $MESH_1_REMOTE_ISTIO_ROOT_CERT_CONFIGMAP -n $MESH_1_ISTIO_CTL_PLANE_NS --from-file=root-cert.pem=temp-mesh-2-istio-root-cert.pem"
 
     # Then, inject mesh 1's root cert as ConfigMap in mesh 2
     echo_bold "Inject mesh 1's Istio root cert into mesh 2..."
-    run_and_log "oc login --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
+    run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
     run_and_log "oc create configmap $MESH_2_REMOTE_ISTIO_ROOT_CERT_CONFIGMAP -n $MESH_2_ISTIO_CTL_PLANE_NS --from-file=root-cert.pem=temp-mesh-1-istio-root-cert.pem"
 
     # Complete, delete those temp files
@@ -220,23 +220,23 @@ install_demo () {
         echo_bold "Now it is the time to inject the cloud load balancers' URL into both end meshes..."
 
         echo_bold "Inject mesh 2's load balancer URL into mesh 1..."
-        run_and_log "oc login --token=$MESH_1_OCP_TOKEN --server=$MESH_1_OCP_SERVER_URL"
+        run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_1_OCP_TOKEN --server=$MESH_1_OCP_SERVER_URL"
         run_and_log "oc patch ServiceMeshPeer $MESH_1_REMOTE_MESH_NAME -n $MESH_1_ISTIO_CTL_PLANE_NS --type json -p '[{\"op\":\"replace\",\"path\":\"/spec/remote/addresses/0\",\"value\":\"$MESH_2_LOAD_BALANCER_MESH_INGRESSGW_URL\"}]'"
 
         echo_bold "Inject mesh 1's load balancer URL into mesh 2..."
-        run_and_log "oc login --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
+        run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
         run_and_log "oc patch ServiceMeshPeer $MESH_2_REMOTE_MESH_NAME -n $MESH_2_ISTIO_CTL_PLANE_NS --type json -p '[{\"op\":\"replace\",\"path\":\"/spec/remote/addresses/0\",\"value\":\"$MESH_1_LOAD_BALANCER_MESH_INGRESSGW_URL\"}]'"
     fi
 
     # Scale all bookinfo namespace pods up and get the product page URL
     echo_bold "Prepare bookinfo application for mesh 1..."
-    run_and_log "oc login --token=$MESH_1_OCP_TOKEN --server=$MESH_1_OCP_SERVER_URL"
+    run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_1_OCP_TOKEN --server=$MESH_1_OCP_SERVER_URL"
     MESH_1_ISTIO_INGRESSGW_URL="http://$(oc get route istio-ingressgateway -n $MESH_1_ISTIO_CTL_PLANE_NS -o 'jsonpath={.spec.host}')"
     run_and_log "oc set env deployment/random-http-traffic-generator -n $MESH_1_BOOKINFO_NS ENV_CURL_URL=$MESH_1_ISTIO_INGRESSGW_URL/productpage" # Make the traffic generator call the Istio gateway
     run_and_log "oc scale deployment -n $MESH_1_BOOKINFO_NS --replicas=1 --all" # Start all deployments
 
     echo_bold "Prepare bookinfo application for mesh 2..."
-    run_and_log "oc login --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
+    run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
     MESH_2_ISTIO_INGRESSGW_URL="http://$(oc get route istio-ingressgateway -n $MESH_2_ISTIO_CTL_PLANE_NS -o 'jsonpath={.spec.host}')"
     run_and_log "oc set env deployment/random-http-traffic-generator -n $MESH_2_BOOKINFO_NS ENV_CURL_URL=$MESH_2_ISTIO_INGRESSGW_URL/productpage" # Make the traffic generator call the Istio gateway
     run_and_log "oc scale deployment -n $MESH_2_BOOKINFO_NS --replicas=1 --all" # Start all deployments
@@ -254,13 +254,13 @@ install_demo () {
 uninstall_demo () {
     # Uninstall the Helm resources for mesh 1
     echo_bold "Trying to uninstall Helm chart for mesh 1..."
-    run_and_log "oc login --token=$MESH_1_OCP_TOKEN --server=$MESH_1_OCP_SERVER_URL"
+    run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_1_OCP_TOKEN --server=$MESH_1_OCP_SERVER_URL"
     run_and_log "oc project $MESH_1_HELM_RELEASE_TO_BE_STORED_NAMESPACE"
     run_and_log "helm uninstall $MESH_1_HELM_RELEASE_NAME"
 
     # Uninstall the Helm resources for mesh 2
     echo_bold "Trying to uninstall Helm chart for mesh 2..."
-    run_and_log "oc login --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
+    run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
     run_and_log "oc project $MESH_2_HELM_RELEASE_TO_BE_STORED_NAMESPACE"
     run_and_log "helm uninstall $MESH_2_HELM_RELEASE_NAME"
 

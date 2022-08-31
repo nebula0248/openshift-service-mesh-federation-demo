@@ -11,15 +11,15 @@
 #
 # 2.  You may change mesh version to a newer version if available and if compatible.
 
-local-mesh-name: mesh2
+local-mesh-name: ossm2
 local-mesh-version: v2.2
-local-mesh-ctl-plane-namespace: mesh2-ctl-plane
-local-mesh-bookinfo-namespace: mesh2-bookinfo
+local-mesh-ctl-plane-namespace: peter-ossm2-ctl
+local-mesh-bookinfo-namespace: peter-ossm2-app
 
-remote-mesh-name: mesh1
-remote-mesh-ctl-plane-namespace: mesh1-ctl-plane
-remote-mesh-bookinfo-namespace: mesh1-bookinfo
-remote-mesh-root-cert-configmap-name: mesh1-ca-root-cert
+remote-mesh-name: ossm1
+remote-mesh-ctl-plane-namespace: peter-ossm1-ctl
+remote-mesh-bookinfo-namespace: peter-ossm1-app
+remote-mesh-root-cert-configmap-name: peter-ossm1-ca-root-cert
 
 
 # Type 1:
@@ -37,7 +37,7 @@ remote-mesh-root-cert-configmap-name: mesh1-ca-root-cert
 #     (In reality, you could have one end using one type, the other end using another type.
 #     However, to make the demo easier, we assume both ends are using the same type.)
 
-# local-and-remote-connectivity-method: ClusterIP
+local-and-remote-connectivity-method: ClusterIP
 
 
 # Type 2:
@@ -53,8 +53,8 @@ remote-mesh-root-cert-configmap-name: mesh1-ca-root-cert
 #
 # 2.  local-mesh-openshift-cloud-provider values could be: {AWS, Azure}
 
-local-and-remote-connectivity-method: LoadBalancer
-local-mesh-openshift-cloud-provider: Azure
+# local-and-remote-connectivity-method: LoadBalancer
+# local-mesh-openshift-cloud-provider: AWS
 
 
 # Type 3:
