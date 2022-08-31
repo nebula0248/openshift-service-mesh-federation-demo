@@ -33,9 +33,10 @@ remote-mesh-root-cert-configmap-name: peter-ossm1-ca-root-cert
 #     ensure that the local mesh namespaces (both control plane and bookinfo) and remote
 #     mesh namespaces are NOT the same.
 #
-# 2.  This value must be the same across values-mesh-1.yaml and values-mesh-2.yaml.
-#     (In reality, you could have one end using one type, the other end using another type.
-#     However, to make the demo easier, we assume both ends are using the same type.)
+# 2.  The value local-and-remote-connectivity-method must be the same across 
+#     values-mesh-1.yaml and values-mesh-2.yaml. (In reality, you could have one end 
+#     using one type, the other end using another type. However, to make the demo 
+#     easier, we assume both ends are using the same type.)
 
 local-and-remote-connectivity-method: ClusterIP
 
@@ -47,9 +48,10 @@ local-and-remote-connectivity-method: ClusterIP
 #
 # Notes:
 #
-# 1.  This value must be the same across values-mesh-1.yaml and values-mesh-2.yaml.
-#     (In reality, you could have one end using one type, the other end using another type.
-#     However, to make the demo easier, we assume both ends are using the same type.)
+# 1.  The value local-and-remote-connectivity-method must be the same across 
+#     values-mesh-1.yaml and values-mesh-2.yaml. (In reality, you could have one end 
+#     using one type, the other end using another type. However, to make the demo 
+#     easier, we assume both ends are using the same type.)
 #
 # 2.  local-mesh-openshift-cloud-provider values could be: {AWS, Azure}
 
@@ -73,9 +75,10 @@ local-and-remote-connectivity-method: ClusterIP
 # 3.  remote-mesh.peering-addresses is an array list. You may list all the IP 
 #     addresses or FQDN of your worker nodes which has nodeport exposed.
 #
-# 4.  This value must be the same across values-mesh-1.yaml and values-mesh-2.yaml.
-#     (In reality, you could have one end using one type, the other end using another type.
-#     However, to make the demo easier, we assume both ends are using the same type.)
+# 4.  The value local-and-remote-connectivity-method must be the same across 
+#     values-mesh-1.yaml and values-mesh-2.yaml. (In reality, you could have one end 
+#     using one type, the other end using another type. However, to make the demo 
+#     easier, we assume both ends are using the same type.)
 
 # local-and-remote-connectivity-method: NodePort
 # local-mesh-ingress-gateway-nodeport-tls-port-number: 30443
