@@ -11,10 +11,10 @@ This repo contains scripts and Helm charts to **support you setting up all the a
 
 > :warning: Please note that all resources provided in this repo are for demo and non-production usage only. Service mesh federation deployment for production requires detailed planning and design. Please do not use this repo directly for any production purposes.
 
-## Prerequisites
+## Demo prerequisites
 
 Please make sure you have the following prerequisites met before proceed:
-- Prepare 1 or 2 **OpenShift v4.6 or above** clusters
+- Prepare 1 or 2 **OpenShift v4.6 or above** clusters, which **both can communicate and have Layer 4 connectivity unrestricted** (to let Istio gateways communicate with each others)
 - Install **OpenShift Service Mesh operators (v2.1 or above)** and other Service Mesh related operators (e.g. Kiali, Distributed Tracing) according to the OpenShift documentation (https://docs.openshift.com/container-platform/4.10/service_mesh/v2x/installing-ossm.html)
 - Read and understand the official OpenShift Service Mesh Federation documentation before proceed (https://docs.openshift.com/container-platform/4.10/service_mesh/v2x/ossm-federation.html#ossm-federation-overview_federation)
 - Install **oc CLI** (oc version >=v4.6)
@@ -36,12 +36,10 @@ Please make sure you have the following prerequisites met before proceed:
 |  MESH_2_HELM_RELEASE_NAME |  The Helm release name that will be saved to your 2nd OpenShift cluster |
 
 > **Note:** If you are going to deploy both service meshes within the same OpenShift cluster (i.e. using ClusterIP as the mesh-to-mesh connectivity). Set `MESH_2_OCP_SERVER_URL` and `MESH_2_OCP_TOKEN` to have the same value as `MESH_1_OCP_SERVER_URL` and `MESH_1_OCP_TOKEN` respectively.
-  
-  
+
 2 - Edit `helm/values-mesh-1.yaml` and `helm/values-mesh-2.yaml`. You may edit the mesh name and the namespace that you want to deploy your service mesh control plane and bookinfo application into.
 > **Note:** Please make sure you have symatically settings at both YAML files (i.e. the name of the **local mesh** inside **values-mesh-1.yaml** matches the name of the **remote mesh** inside **value-mesh-2.yaml**, etc.)
-  
-  
+
 3 - Inside `helm/values-mesh-1.yaml` and `helm/values-mesh-2.yaml`, select which type of connectivity you want to establish by commenting and uncommenting.
 - **For both meshes that stay within the same OpenShift cluster**: Uncomment the lines below the Type 1 comment block, and comment out all other lines below Type 2 and Type 3.
 - **For both meshes across 2 OpenShift clusters via LoadBalancer**: Uncomment the lines below the Type 2 comment block, and comment out all other lines below Type 1 and Type 3.
@@ -51,3 +49,14 @@ Please make sure you have the following prerequisites met before proceed:
 
 > If you are using **NodePort**, change `remote-mesh-peering-addresses` to include a list of IPs or FQDNs that have NodePort exposed for connectivity. In most cases, you may enter a list of worker node IP addresses.
 
+4 - Execute `./run.sh install`.
+
+5 - Enjoy :)
+
+## Uninstall the demo
+
+Simply run `./run.sh uninstall` after you have installed the demo. This will trigger a script to remove all Helm releases.
+
+## Author and contact
+
+If there are any questions or issues, please submit a GitHub issue (much apprecated). Please also feel free to connect with the author (Peter Ho) through LinkedIn here (https://www.linkedin.com/in/peter-ho-man-fai/).
