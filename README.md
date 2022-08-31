@@ -36,10 +36,12 @@ Please make sure you have the following prerequisites met before proceed:
 |  MESH_2_HELM_RELEASE_NAME |  The Helm release name that will be saved to your 2nd OpenShift cluster |
 
 > **Note:** If you are going to deploy both service meshes within the same OpenShift cluster (i.e. using ClusterIP as the mesh-to-mesh connectivity). Set `MESH_2_OCP_SERVER_URL` and `MESH_2_OCP_TOKEN` to have the same value as `MESH_1_OCP_SERVER_URL` and `MESH_1_OCP_TOKEN` respectively.
-
+  
+  
 2 - Edit `helm/values-mesh-1.yaml` and `helm/values-mesh-2.yaml`. You may edit the mesh name and the namespace that you want to deploy your service mesh control plane and bookinfo application into.
 > **Note:** Please make sure you have symatically settings at both YAML files (i.e. the name of the **local mesh** inside **values-mesh-1.yaml** matches the name of the **remote mesh** inside **value-mesh-2.yaml**, etc.)
-
+  
+  
 3 - Inside `helm/values-mesh-1.yaml` and `helm/values-mesh-2.yaml`, select which type of connectivity you want to establish by commenting and uncommenting.
 - **For both meshes that stay within the same OpenShift cluster**: Uncomment the lines below the Type 1 comment block, and comment out all other lines below Type 2 and Type 3.
 - **For both meshes across 2 OpenShift clusters via LoadBalancer**: Uncomment the lines below the Type 2 comment block, and comment out all other lines below Type 1 and Type 3.
