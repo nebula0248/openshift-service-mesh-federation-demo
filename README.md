@@ -1,6 +1,6 @@
 # OpenShift Service Mesh Federation Demo
 
-This demo shows how to use OpenShift Service Mesh Federation to establish peering between 2 service meshes. In general, there are 3 ways to implement mesh-to-mesh federation connectivities:
+This demo shows how to use OpenShift Service Mesh Federation to establish peering between 2 service meshes. Here we showcase 3 types of mesh-to-mesh federation connectivities:
 - `ClusterIP` (usually for meshes within the same OpenShift cluster)
 ![Alt text](images/clusterip.png?raw=true "Using ClusterIP to connect")
 - `LoadBalancer` (usually for meshes across 2 OpenShift clusters on public cloud providers)
@@ -8,7 +8,7 @@ This demo shows how to use OpenShift Service Mesh Federation to establish peerin
 - `NodePort` (usually for meshes across 2 OpenShift clusters on-premises)
 ![Alt text](images/nodeport.png?raw=true "Using ClusterIP to connect")
 
-This repo contains scripts and Helm charts to **support you setting up all 3 connectivity scenerios** demo quickly and automatically.
+In reality, you do not need to use same type of service exposure for both clusters, and you may use one type at one end and the other type at the opposite end (e.g. cluster A exposes via NodePort, and cluster B exposes via LoadBalancer). However, **to simplify this demo, this demo script assums both ends use the same service exposure type.**
 
 Beside, this demo leverages the well-known Istio demo app, **Bookinfo**, to showcase how to use the **failover capability** (https://docs.openshift.com/container-platform/4.10/service_mesh/v2x/ossm-federation.html#ossm-federation-config-failover-overview_federation) to implement individual app-level failover resilience. With the failover capability provided by the mesh federation, individual apps can now be failed over to another mesh / OpenShift cluster when it is not available.
 
