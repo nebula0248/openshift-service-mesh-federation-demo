@@ -11,10 +11,10 @@ MESH_1_OCP_TOKEN="sha256~XXXXX"
 MESH_2_OCP_SERVER_URL="https://XXXXX"
 MESH_2_OCP_TOKEN="sha256~XXXXX"
 
-MESH_1_HELM_RELEASE_TO_BE_STORED_NAMESPACE="peter-ossm-helm" # Make sure you have this namespace pre-created in your Mesh 1 OCP cluster.
+MESH_1_HELM_RELEASE_NAMESPACE="peter-ossm-helm"
 MESH_1_HELM_RELEASE_NAME="ossm-federation-demo-mesh-1"
 
-MESH_2_HELM_RELEASE_TO_BE_STORED_NAMESPACE="peter-ossm-helm" # Make sure you have this namespace pre-created in your Mesh 2 OCP cluster.
+MESH_2_HELM_RELEASE_NAMESPACE="peter-ossm-helm"
 MESH_2_HELM_RELEASE_NAME="ossm-federation-demo-mesh-2"
 
 
@@ -57,7 +57,12 @@ install_demo () {
     # Install the Helm resources for mesh 1
     echo_bold "Trying to install Helm chart for mesh 1..."
     run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_1_OCP_TOKEN --server=$MESH_1_OCP_SERVER_URL"
-    run_and_log "oc project $MESH_1_HELM_RELEASE_TO_BE_STORED_NAMESPACE"
+    oc get "project/$MESH_1_HELM_RELEASE_NAMESPACE" > /dev/null 2>&1
+    if [ "$?" != "0" ]; then 
+        echo_bold "Project $MESH_1_HELM_RELEASE_NAMESPACE not yet exist... Create now"
+        run_and_log "oc new-project $MESH_1_HELM_RELEASE_NAMESPACE"
+    fi
+    run_and_log "oc project $MESH_1_HELM_RELEASE_NAMESPACE"
     run_and_log "helm install $MESH_1_HELM_RELEASE_NAME -f helm/values-mesh-1.yaml ./helm"
 
     # Wait until mesh 1's Istio control plane is ready and installed
@@ -127,7 +132,12 @@ install_demo () {
     # Install the Helm resources for mesh 2
     echo_bold "Trying to install Helm chart for mesh 2..."
     run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
-    run_and_log "oc project $MESH_2_HELM_RELEASE_TO_BE_STORED_NAMESPACE"
+    oc get "project/$MESH_2_HELM_RELEASE_NAMESPACE" > /dev/null 2>&1
+    if [ "$?" != "0" ]; then 
+        echo_bold "Project $MESH_2_HELM_RELEASE_NAMESPACE not yet exist... Create now"
+        run_and_log "oc new-project $MESH_2_HELM_RELEASE_NAMESPACE"
+    fi
+    run_and_log "oc project $MESH_2_HELM_RELEASE_NAMESPACE"
     run_and_log "helm install $MESH_2_HELM_RELEASE_NAME -f helm/values-mesh-2.yaml ./helm"
 
     # Wait until mesh 2's Istio control plane is ready and installed
@@ -255,13 +265,13 @@ uninstall_demo () {
     # Uninstall the Helm resources for mesh 1
     echo_bold "Trying to uninstall Helm chart for mesh 1..."
     run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_1_OCP_TOKEN --server=$MESH_1_OCP_SERVER_URL"
-    run_and_log "oc project $MESH_1_HELM_RELEASE_TO_BE_STORED_NAMESPACE"
+    run_and_log "oc project $MESH_1_HELM_RELEASE_NAMESPACE"
     run_and_log "helm uninstall $MESH_1_HELM_RELEASE_NAME"
 
     # Uninstall the Helm resources for mesh 2
     echo_bold "Trying to uninstall Helm chart for mesh 2..."
     run_and_log "oc login --insecure-skip-tls-verify=true --token=$MESH_2_OCP_TOKEN --server=$MESH_2_OCP_SERVER_URL"
-    run_and_log "oc project $MESH_2_HELM_RELEASE_TO_BE_STORED_NAMESPACE"
+    run_and_log "oc project $MESH_2_HELM_RELEASE_NAMESPACE"
     run_and_log "helm uninstall $MESH_2_HELM_RELEASE_NAME"
 
     # Complete
