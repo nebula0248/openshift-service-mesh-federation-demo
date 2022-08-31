@@ -53,13 +53,13 @@ Please make sure you have the following prerequisites met before proceed:
 4 - Execute `./run.sh install`.
 
 ## Verify your installation
-After installation, **please go to your OpenShift clusters and find the `ServiceMeshPeer` object** inside your service mesh control plane namespaces. You should see `connected` under status.
+After installation, **please go to your OpenShift clusters and find the `ServiceMeshPeer` object** inside your service mesh control plane namespaces. You should see `connected` equals to `true` under status.
 ![Alt text](images/status-connected.png?raw=true "ServiceMeshPeer object shows connected")
 
-Once you have verified the ServiceMeshPeer objects at both ends are connected, you may open Kiali to view the service mesh topology. The demo script automatically creates a HTTP traffic generator to simulate user traffic for you to view live tracing in Kiali.
+Once you have verified the `ServiceMeshPeer` objects at both ends are connected, you may open Kiali to view the service mesh topology. The demo script automatically creates a HTTP traffic generator to simulate user traffic for you to view live tracing in Kiali.
 ![Alt text](images/kiali-normal.png?raw=true "Kiali's view after installation")
 
-**Try to scale down the `details` and `ratings` deployment at one mesh side. **After a few moments, the connection should be failing over to another mesh automatically. Kiali should be showing the connections to `details and ratings` are now redirected to another mesh.
+**Try to scale down the `details` and `ratings` deployment at one mesh.** After a few moments, the connection should be failed over to another mesh automatically. Kiali should be showing the connections to `details` and `ratings` are now redirected to another mesh.
 ![Alt text](images/kiali-failover.png?raw=true "Kiali's view after details and ratings in local mesh are down")
 
 ## Uninstall the demo
