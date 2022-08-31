@@ -4,12 +4,12 @@ OpenShift Service Mesh Federation allows you to connect services between separat
 
 In general, there are 3 ways to implement mesh-to-mesh federation connectivities:
 - `ClusterIP` (usually for meshes within the same OpenShift cluster)
-- `NodePort` (usually for meshes across 2 OpenShift clusters on-premises)
 - `LoadBalancer` (usually for meshes across 2 OpenShift clusters on public cloud providers)
+- `NodePort` (usually for meshes across 2 OpenShift clusters on-premises)
 
 This repo contains scripts and Helm charts to **support you setting up all the above 3 connectivity scenerios** demo quickly and automatically.
 
-> :warning: Please note that all resources provided in this repo are for demo and non-production usage only. Service mesh federation deployment for production requires detailed planning and design. Please do not use this repo directly for any production purpose.
+> :warning: Please note that all resources provided in this repo are for demo and non-production usage only. Service mesh federation deployment for production requires detailed planning and design. Please do not use this repo directly for any production purposes.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ Please make sure you have the following prerequisites met before proceed:
 
 ## How to deploy the demo resources
 
-1. Open and edit `run.sh` and change the values of the following variables **at the top of the script**:
+1 - Edit `run.sh` and change the values of the following variables located **at the top of the script**:
 
 | Variable name  | Description  |
 | ------------ | ------------ |
@@ -35,4 +35,16 @@ Please make sure you have the following prerequisites met before proceed:
 |  MESH_2_HELM_RELEASE_TO_BE_STORED_NAMESPACE |  The namespace that our Helm release will be saved to your 2nd OpenShift cluster |
 |  MESH_2_HELM_RELEASE_NAME |  The Helm release name that will be saved to your 2nd OpenShift cluster |
 
-**Note: ** If you are going to deploy both service meshes within the same OpenShift cluster (i.e. using ClusterIP as the mesh-to-mesh connectivity). Set `MESH_2_OCP_SERVER_URL` and `MESH_2_OCP_TOKEN` having the same value as `MESH_1_OCP_SERVER_URL` and `MESH_1_OCP_TOKEN` respectively.
+> **Note:** If you are going to deploy both service meshes within the same OpenShift cluster (i.e. using ClusterIP as the mesh-to-mesh connectivity). Set `MESH_2_OCP_SERVER_URL` and `MESH_2_OCP_TOKEN` to have the same value as `MESH_1_OCP_SERVER_URL` and `MESH_1_OCP_TOKEN` respectively.
+
+2 - Edit `helm/values-mesh-1.yaml` and `helm/values-mesh-2.yaml`. You may edit the mesh name and the namespace that you want to deploy your service mesh control plane and bookinfo application into.
+> **Note:** Please make sure you have symatically settings at both YAML files (i.e. the name of the **local mesh** inside **values-mesh-1.yaml** matches the name of the **remote mesh** inside **value-mesh-2.yaml**, etc.)
+
+3 - Inside `helm/values-mesh-1.yaml` and `helm/values-mesh-2.yaml`, select which type of connectivity you want to establish by commenting and uncommenting.
+- **For both meshes that stay within the same OpenShift cluster**: Uncomment the lines below the Type 1 comment block, and comment out all other lines below Type 2 and Type 3.
+- **For both meshes across 2 OpenShift clusters via LoadBalancer **: Uncomment the lines below the Type 2 comment block, and comment out all other lines below Type 1 and Type 3.
+- **For both meshes across 2 OpenShift clusters via NodePort **: Uncomment the lines below the Type 3 comment block, and comment out all other lines below Type 1 and Type 2.
+
+> If you are using **LoadBalancer** type, change `local-mesh-openshift-cloud-provider` to either `AWS` or `Azure` (this script only supports AWS and Azure). Setting this will make the script provide a public internet-facing load balancer on your cloud provider for federation connectivity.
+
+> If you are using **NodePort**, change `remote-mesh-peering-addresses` to include a list of IPs or FQDNs that have NodePort exposed for connectivity. In most cases, you may enter a list of worker node IP addresses.
