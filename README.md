@@ -4,9 +4,9 @@ This demo shows how to use OpenShift Service Mesh Federation to establish peerin
 - `ClusterIP` (usually for meshes within the same OpenShift cluster)
 ![Alt text](images/clusterip.png?raw=true "Using ClusterIP to connect")
 - `LoadBalancer` (usually for meshes across 2 OpenShift clusters on public cloud providers)
-![Alt text](images/loadbalancer.png?raw=true "Using ClusterIP to connect")
+![Alt text](images/loadbalancer.png?raw=true "Using LoadBalancer to connect")
 - `NodePort` (usually for meshes across 2 OpenShift clusters on-premises)
-![Alt text](images/nodeport.png?raw=true "Using ClusterIP to connect")
+![Alt text](images/nodeport.png?raw=true "Using NodePort to connect")
 
 In reality, you do not need to use same type of service exposure for both clusters, and you may use one type at one end and the other type at the opposite end (e.g. cluster A exposes via NodePort, and cluster B exposes via LoadBalancer). However, **to simplify this demo, this demo script assums both ends use the same service exposure type.**
 
