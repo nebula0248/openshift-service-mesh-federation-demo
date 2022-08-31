@@ -42,8 +42,8 @@ Please make sure you have the following prerequisites met before proceed:
 
 3 - Inside `helm/values-mesh-1.yaml` and `helm/values-mesh-2.yaml`, select which type of connectivity you want to establish by commenting and uncommenting.
 - **For both meshes that stay within the same OpenShift cluster**: Uncomment the lines below the Type 1 comment block, and comment out all other lines below Type 2 and Type 3.
-- **For both meshes across 2 OpenShift clusters via LoadBalancer **: Uncomment the lines below the Type 2 comment block, and comment out all other lines below Type 1 and Type 3.
-- **For both meshes across 2 OpenShift clusters via NodePort **: Uncomment the lines below the Type 3 comment block, and comment out all other lines below Type 1 and Type 2.
+- **For both meshes across 2 OpenShift clusters via LoadBalancer**: Uncomment the lines below the Type 2 comment block, and comment out all other lines below Type 1 and Type 3.
+- **For both meshes across 2 OpenShift clusters via NodePort**: Uncomment the lines below the Type 3 comment block, and comment out all other lines below Type 1 and Type 2.
 
 > If you are using **LoadBalancer** type, change `local-mesh-openshift-cloud-provider` to either `AWS` or `Azure` (this script only supports AWS and Azure). Setting this will make the script provide a public internet-facing load balancer on your cloud provider for federation connectivity.
 
