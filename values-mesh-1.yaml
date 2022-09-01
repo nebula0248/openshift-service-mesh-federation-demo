@@ -19,7 +19,6 @@ local-mesh-bookinfo-namespace: peter-ossm1-app
 remote-mesh-name: ossm2
 remote-mesh-ctl-plane-namespace: peter-ossm2-ctl
 remote-mesh-bookinfo-namespace: peter-ossm2-app
-remote-mesh-root-cert-configmap-name: peter-ossm2-ca-root-cert
 
 
 # Type 1:

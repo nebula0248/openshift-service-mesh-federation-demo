@@ -9,7 +9,7 @@ metadata:
     app.openshift.io/runtime: nodejs
     app.kubernetes.io/part-of: ratings
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: ratings

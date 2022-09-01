@@ -19,7 +19,6 @@ local-mesh-bookinfo-namespace: peter-ossm2-app
 remote-mesh-name: ossm1
 remote-mesh-ctl-plane-namespace: peter-ossm1-ctl
 remote-mesh-bookinfo-namespace: peter-ossm1-app
-remote-mesh-root-cert-configmap-name: peter-ossm1-ca-root-cert
 
 
 # Type 1:
@@ -56,7 +55,7 @@ local-and-remote-connectivity-method: ClusterIP
 # 2.  local-mesh-openshift-cloud-provider values could be: {AWS, Azure}
 
 # local-and-remote-connectivity-method: LoadBalancer
-# local-mesh-openshift-cloud-provider: AWS
+# local-mesh-openshift-cloud-provider: Azure
 
 
 # Type 3:

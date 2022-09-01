@@ -18,7 +18,6 @@ Beside, this demo leverages the well-known Istio demo app, **Bookinfo**, to show
 
 Please make sure you have the following prerequisites met before proceed:
 - Prepare 1 or 2 **OpenShift v4.6 or above** clusters. **Both clusters can communicate and have unrestricted Layer 4 connectivity ** (to let Istio gateways communicate with each other)
-- Install **OpenShift Service Mesh operator (v2.1 or above)** and other Service Mesh related operators (e.g. Kiali, Distributed Tracing) according to the OpenShift documentation (https://docs.openshift.com/container-platform/4.10/service_mesh/v2x/installing-ossm.html)
 - Read and understand the official OpenShift Service Mesh Federation documentation (https://docs.openshift.com/container-platform/4.10/service_mesh/v2x/ossm-federation.html#ossm-federation-overview_federation)
 - Install **oc CLI** (oc version >=v4.6)
 - Install **helm CLI** (helm version >=v3.6)
@@ -31,19 +30,16 @@ Please make sure you have the following prerequisites met before proceed:
 | ------------ | ------------ |
 | MESH_1_OCP_SERVER_URL  | Set this to your 1st OpenShift cluster's API 6443 port endpoint (e.g. https://api.your-cluster.com:6443)  |
 | MESH_1_OCP_TOKEN  |  Set this to your oc login command's token for authenticating into your 1st OpenShift cluster (e.g. sha256~XXXXX). |
+|  MESH_1_HELM_RELEASE_NAMESPACE |  The namespace that our Helm release will be saved to your 1st OpenShift cluster. |
 | MESH_2_OCP_SERVER_URL  |  Set this to your 2nd OpenShift cluster's API 6443 port endpoint (e.g. https://api.your-another-cluster.com:6443) |
 | MESH_2_OCP_TOKEN  |  Set this to your oc login command's token for authenticating into your 2nd OpenShift cluster (e.g. sha256~XXXXX). |
-|  MESH_1_HELM_RELEASE_NAMESPACE |  The namespace that our Helm release will be saved to your 1st OpenShift cluster. |
-|  MESH_1_HELM_RELEASE_NAME | The Helm release name that will be saved to your 1st OpenShift cluster. |
 |  MESH_2_HELM_RELEASE_NAMESPACE |  The namespace that our Helm release will be saved to your 2nd OpenShift cluster. |
-|  MESH_2_HELM_RELEASE_NAME |  The Helm release name that will be saved to your 2nd OpenShift cluster. |
-
 > **Note:** If you are going to deploy both service meshes within the same OpenShift cluster (i.e. using ClusterIP as the mesh-to-mesh connectivity). Set `MESH_2_OCP_SERVER_URL` and `MESH_2_OCP_TOKEN` to have the same value as `MESH_1_OCP_SERVER_URL` and `MESH_1_OCP_TOKEN` respectively.
 
-2 - Edit `helm/values-mesh-1.yaml` and `helm/values-mesh-2.yaml`. You may edit the mesh name and the namespace that you want to deploy your service mesh control plane and bookinfo application.
+2 - Edit `values-mesh-1.yaml` and `values-mesh-2.yaml`. You may edit the mesh name and the namespace that you want to deploy your service mesh control plane and bookinfo application.
 > **Note:** Please make sure you have symatically settings at both YAML files (i.e. the name of the **local mesh** inside **values-mesh-1.yaml** matches the name of the **remote mesh** inside **value-mesh-2.yaml**, etc.)
 
-3 - Inside `helm/values-mesh-1.yaml` and `helm/values-mesh-2.yaml`, select which type of connectivity you want to establish by commenting (e.g. putting a # sign) and uncommenting.
+3 - Inside `values-mesh-1.yaml` and `values-mesh-2.yaml`, select which type of connectivity you want to establish by commenting (e.g. putting a # sign) and uncommenting.
 - **For meshes that stay within the same OpenShift cluster**: Uncomment the lines below the Type 1 comment block, and comment out all other lines below Type 2 and Type 3.
 - **For meshes across 2 OpenShift clusters via LoadBalancer**: Uncomment the lines below the Type 2 comment block, and comment out all other lines below Type 1 and Type 3.
 - **For meshes across 2 OpenShift clusters via NodePort**: Uncomment the lines below the Type 3 comment block, and comment out all other lines below Type 1 and Type 2.

@@ -1,5 +1,0 @@
-kind: Namespace
-apiVersion: v1
-metadata:
-  name: {{ index .Values "local-mesh-ctl-plane-namespace" }}
-spec:

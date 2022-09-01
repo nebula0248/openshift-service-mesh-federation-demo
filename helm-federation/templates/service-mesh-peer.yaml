@@ -31,4 +31,4 @@ spec:
    clientID: {{ index .Values "remote-mesh-name" }}.local/ns/{{ index .Values "remote-mesh-ctl-plane-namespace" }}/sa/{{ index .Values "local-mesh-name" }}-egress-service-account
    certificateChain:
      kind: ConfigMap
-     name: {{ index .Values "remote-mesh-root-cert-configmap-name" }}
+     name: {{ index .Values "remote-mesh-name" }}-ca-root-cert

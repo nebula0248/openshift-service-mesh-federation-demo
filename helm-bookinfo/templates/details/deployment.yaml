@@ -9,7 +9,7 @@ metadata:
     app.openshift.io/runtime: ruby
     app.kubernetes.io/part-of: details
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: details
