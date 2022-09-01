@@ -62,6 +62,11 @@ Once you have verified the `ServiceMeshPeer` objects at both ends are connected,
 
 Simply run `./run.sh uninstall`. This will trigger a script to remove all Helm releases. Note that the script will not delete the namespace that Helm release resides to prevent any unexpected deletion.
 
+## Tested environments
+- Self-managed OpenShift v4.10.25 + OpenShift Service Mesh v2.2.1 on VMWare vSphere (via ClusterIP and NodePort)
+- Self-managed OpenShift v4.11.1 + OpenShift Service Mesh v2.2.1 on Azure (via LoadBalancer)
+- Self-managed OpenShift v4.9.45 + OpenShift Service Mesh v2.2.1 on AWS (via LoadBalancer)
+
 ## Author and contact
 
 If there are any questions or issues, please submit a GitHub issue (much apprecated). Feel free to connect with the author (Peter Ho) through LinkedIn here (https://www.linkedin.com/in/peter-ho-man-fai/).
