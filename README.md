@@ -17,7 +17,7 @@ Beside, this demo leverages the well-known Istio demo app, **Bookinfo**, to show
 ## Demo prerequisites
 
 Please make sure you have the following prerequisites met before proceed:
-- Prepare 1 or 2 **OpenShift v4.6 or above** clusters. **Both clusters can communicate and have unrestricted Layer 4 connectivity ** (to let Istio gateways communicate with each other)
+- Prepare 1 or 2 **OpenShift v4.6 or above** clusters. **Both clusters can communicate and have unrestricted Layer 4 connectivity** (to let Istio gateways communicate with each other)
 - Read and understand the official OpenShift Service Mesh Federation documentation (https://docs.openshift.com/container-platform/4.10/service_mesh/v2x/ossm-federation.html#ossm-federation-overview_federation)
 - Install **oc CLI** (oc version >=v4.6)
 - Install **helm CLI** (helm version >=v3.6)
